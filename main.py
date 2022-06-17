@@ -1,6 +1,23 @@
 import random
 
 
+def fill_matrix2(matrix):
+    i = 0
+    j = 0
+    i, j = findNextCell(matrix, i, j)
+    if i == -2:
+        return True
+    numbers = create_random_number_list()
+    for m in range(0, 9):
+        if isValid(matrix, i, j, numbers[m]):
+            matrix[i][j] = numbers[m]
+            if fill_matrix2(matrix):
+                return True
+            matrix[i][j] = -1
+
+    return False
+
+
 def create_matrix():
     matrix_inner = []
     matrix = []
@@ -20,7 +37,7 @@ def create_matrix():
 def fill_matrix(matrix: list):
     cells_filled = 0
     number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    while cells_filled < 15:
+    while cells_filled < 20:
         temp_number_list = number_list
         row = random.randint(0, 8)
         col = random.randint(0, 8)
@@ -65,11 +82,6 @@ def input_value(matrix: list):
 
 
 def findNextCell(matrix: list, i, j):
-    for m in range(i, 9):
-        for n in range(j, 9):
-            if matrix[m][n] == -1:
-                return m, n
-
     for m in range(0, 9):
         for n in range(0, 9):
             if matrix[m][n] == -1:
@@ -93,14 +105,28 @@ def isValid(matrix, i, j, v):
     return False
 
 
-def solve_matrix(matrix: list, i=0, j=0):
+def create_random_number_list():
+    numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    new_numbers = []
+    while len(numbers) != 0:
+        rand_index = random.randint(0, len(numbers) - 1)
+        new_numbers.append(numbers[rand_index])
+        del numbers[rand_index]
+
+    return new_numbers
+
+
+def solve_matrix(matrix):
+    i = 0
+    j = 0
     i, j = findNextCell(matrix, i, j)
     if i == -2:
         return True
-    for m in range(1, 10):
-        if isValid(matrix, i, j, m):
-            matrix[i][j] = m
-            if solve_matrix(matrix, i, j):
+    numbers = create_random_number_list()
+    for m in range(0, 9):
+        if isValid(matrix, i, j, numbers[m]):
+            matrix[i][j] = numbers[m]
+            if solve_matrix(matrix):
                 return True
             matrix[i][j] = -1
 
@@ -108,11 +134,20 @@ def solve_matrix(matrix: list, i=0, j=0):
 
 
 def main():
+    matrix = [
+        [7, 8, -1, 4, -1, -1, 1, 2, -1],
+        [6, -1, -1, -1, 7, 5, -1, -1, 9],
+        [-1, -1, -1, 6, -1, 1, -1, 7, 8],
+        [-1, -1, 7, -1, 4, -1, 2, 6, 0],
+        [-1, -1, 1, -1, 5, -1, 9, 3, -1],
+        [9, -1, 4, -1, 6, -1, -1, -1, 5],
+        [-1, 7, -1, 3, -1, -1, -1, 1, 2],
+        [1, 2, -1, -1, -1, 7, 4, -1, -1],
+        [-1, 4, 9, 2, -1, 6, -1, -1, 7]]
+
     matrix = create_matrix()
-    fill_matrix(matrix)
-    print_matrix(matrix)
-    solve_matrix(matrix)
-    print_matrix(matrix)
+    fill_matrix2(matrix)
+    print(matrix)
 
 
 if __name__ == '__main__':
