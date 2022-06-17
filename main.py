@@ -1,16 +1,27 @@
 import random
 
 
-def create_spaces(matrix):
+def create_spaces(matrix, level):
+    if level == 1:
+        spaces = 10
+    elif level == 2:
+        spaces = 20
+    else:
+        spaces = 30
     pair_list = []
     for m in range(0, 9):
         for n in range(0, 9):
             pair_list.append([m, n])
 
-    for i in range(0, 20):
+    open_spaces = []
+
+    for i in range(0, spaces):
         index = random.randint(0, len(pair_list) - 1)
         matrix[pair_list[index][0]][pair_list[index][1]] = -1
+        open_spaces.append([pair_list[index][0], pair_list[index][1]])
         del pair_list[index]
+
+    return open_spaces
 
 
 def fill_matrix2(matrix):
@@ -21,7 +32,7 @@ def fill_matrix2(matrix):
         return True
     numbers = create_random_number_list()
     for m in range(0, 9):
-        if isValid(matrix, i, j, numbers[m]):
+        if isValid(matrix, i, j, numbers[m], False):
             matrix[i][j] = numbers[m]
             if fill_matrix2(matrix):
                 return True
@@ -56,7 +67,7 @@ def fill_matrix(matrix: list):
         if matrix[row][col] == -1:
             while len(temp_number_list) != 0:
                 value = random.randint(0, len(temp_number_list) - 1)
-                if isValid(matrix, row, col, temp_number_list[value]):
+                if isValid(matrix, row, col, temp_number_list[value], False):
                     matrix[row][col] = temp_number_list[value]
                     cells_filled += 1
                     break
@@ -78,17 +89,26 @@ def print_matrix(matrix: list):
     print("\n-------------------------------------------")
 
 
-def input_value(matrix: list):
+def isSpaceOpen(open_spaces: list, row: int, col: int):
+    if [row, col] in open_spaces:
+        return True
+    else:
+        print("This Space is Not Open")
+        return False
+
+
+def input_value(matrix: list, open_spaces: list):
     while True:
-        col_input = int(input("Input Collum Cell you would like to change 1 to 9: "))
-        row_input = int(input("Input Row Cell you would like to change from 1 to 9: "))
+        col_input = int(input("Input Collum Cell you would like to change 1 to 9: ")) - 1
+        row_input = int(input("Input Row Cell you would like to change from 1 to 9: ")) - 1
         number_input = int(input("Input Number you want to place inside from 1 to 9: "))
-        if 0 < row_input < 10 and 0 < col_input < 10 and 0 < number_input < 10 \
-                and isValid(matrix, row_input, col_input, number_input):
+        if -1 < row_input < 9 and -1 < col_input < 9 and 0 < number_input < 10 \
+                and isValid(matrix, row_input, col_input, number_input, True) \
+                and isSpaceOpen(open_spaces, row_input, col_input):
             break
         else:
             print("Invalid Input Please Try Again")
-    matrix[row_input - 1][col_input - 1] = number_input
+    matrix[row_input][col_input] = number_input
 
     return matrix
 
@@ -102,16 +122,24 @@ def findNextCell(matrix: list, i, j):
     return -2, -2
 
 
-def isValid(matrix, i, j, v):
+def isValid(matrix, i, j, v, user):
     rowOk = all([v != matrix[i][x] for x in range(9)])
-    if rowOk:
+    if not rowOk:
+        if user:
+            print("Current Number is Already being used in that row")
+    else:
         columnOk = all([v != matrix[x][j] for x in range(9)])
-        if columnOk:
+        if not columnOk:
+            if user:
+                print("Current Number is Already being used in that row")
+        else:
             # finding the top left x,y co-ordinates of the section containing the i,j cell
             secTopX, secTopY = 3 * (i // 3), 3 * (j // 3)  # floored quotient should be used here.
             for x in range(secTopX, secTopX + 3):
                 for y in range(secTopY, secTopY + 3):
                     if matrix[x][y] == v:
+                        if user:
+                            print("Current Number is Already being used in that section")
                         return False
             return True
     return False
@@ -136,7 +164,7 @@ def solve_matrix(matrix):
         return True
     numbers = create_random_number_list()
     for m in range(0, 9):
-        if isValid(matrix, i, j, numbers[m]):
+        if isValid(matrix, i, j, numbers[m], False):
             matrix[i][j] = numbers[m]
             if solve_matrix(matrix):
                 return True
@@ -145,13 +173,41 @@ def solve_matrix(matrix):
     return False
 
 
+def userSolved(matrix: list):
+    i, j = findNextCell(matrix, 0, 0)
+    if i == -2:
+        return False
+    else:
+        return True
+
+
 def main():
-    matrix = create_matrix()
-    fill_matrix2(matrix)
-    create_spaces(matrix)
-    print_matrix(matrix)
-    solve_matrix(matrix)
-    print_matrix(matrix)
+    print("Welcome to the Sudoku Program")
+    matrix = create_matrix()  # creates a blank grid
+    fill_matrix2(matrix)  # creates a solved game
+    level_input = 0
+    while level_input < 1 or level_input > 4:
+        level_input = int(input("Please Chose your Level \n\n1. Easy (10 Spaces) \n2. Medium (20 Spaces) "
+                                "\n3. Hard (30 Spaces) \n4. Exit Program\n\n"))
+        if 0 < level_input < 5:
+            break
+        else:
+            print("Invalid Input Please Try Again")
+
+    if level_input == 4:
+        exit(0)
+    open_spaces = create_spaces(matrix, level_input)
+    while True:
+        print_matrix(matrix)
+        user_input = int(input("Please Chose an Option \n\n1. Input a Number \n2. Solve Puzzle \n3. Exit Program\n\n"))
+        if user_input == 1:
+            input_value(matrix, open_spaces)
+        elif user_input == 2:
+            solve_matrix(matrix)
+            print_matrix(matrix)
+            break
+        elif user_input == 3:
+            break
 
 
 if __name__ == '__main__':
