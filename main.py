@@ -1,6 +1,18 @@
 import random
 
 
+def create_spaces(matrix):
+    pair_list = []
+    for m in range(0, 9):
+        for n in range(0, 9):
+            pair_list.append([m, n])
+
+    for i in range(0, 20):
+        index = random.randint(0, len(pair_list) - 1)
+        matrix[pair_list[index][0]][pair_list[index][1]] = -1
+        del pair_list[index]
+
+
 def fill_matrix2(matrix):
     i = 0
     j = 0
@@ -134,20 +146,12 @@ def solve_matrix(matrix):
 
 
 def main():
-    matrix = [
-        [7, 8, -1, 4, -1, -1, 1, 2, -1],
-        [6, -1, -1, -1, 7, 5, -1, -1, 9],
-        [-1, -1, -1, 6, -1, 1, -1, 7, 8],
-        [-1, -1, 7, -1, 4, -1, 2, 6, 0],
-        [-1, -1, 1, -1, 5, -1, 9, 3, -1],
-        [9, -1, 4, -1, 6, -1, -1, -1, 5],
-        [-1, 7, -1, 3, -1, -1, -1, 1, 2],
-        [1, 2, -1, -1, -1, 7, 4, -1, -1],
-        [-1, 4, 9, 2, -1, 6, -1, -1, 7]]
-
     matrix = create_matrix()
     fill_matrix2(matrix)
-    print(matrix)
+    create_spaces(matrix)
+    print_matrix(matrix)
+    solve_matrix(matrix)
+    print_matrix(matrix)
 
 
 if __name__ == '__main__':
