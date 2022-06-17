@@ -76,15 +76,37 @@ def fill_matrix(matrix: list):
 
 
 def print_matrix(matrix: list):
+    row_number = 1
     col_string = " "
+    print("   ", end="")
+    for i in range(1, 10):
+        if (i - 1) % 3 == 0 and i != 1:
+            print("|| " + str(i) + " ", end="")
+        else:
+            print("| " + str(i) + " ", end="")
+    print("\n=============================================")
     for row in matrix:
-        print("\n-------------------------------------------")
+        if row_number > 1:
+            if (row_number - 1) % 3 == 0:
+                print("\n===========================================")
+            else:
+                print("\n-------------------------------------------")
+
+        print(str(row_number) + " |", end="")
+        row_number += 1
+        col_number = 0
         for col in row:
             if col > 0:
                 col_string = str(col)
             else:
                 col_string = " "
-            print("| " + col_string + " ", end="")
+
+            if col_number % 3 == 0 and col_number != 0:
+                print("|| " + col_string + " ", end="")
+            else:
+                print("| " + col_string + " ", end="")
+
+            col_number += 1
 
     print("\n-------------------------------------------")
 
@@ -180,11 +202,11 @@ def userSolved(matrix: list):
     else:
         return True
 
-
-def main():
+def game():
     print("Welcome to the Sudoku Program")
     matrix = create_matrix()  # creates a blank grid
     fill_matrix2(matrix)  # creates a solved game
+    print_matrix(matrix)
     level_input = 0
     while level_input < 1 or level_input > 4:
         level_input = int(input("Please Chose your Level \n\n1. Easy (10 Spaces) \n2. Medium (20 Spaces) "
@@ -208,6 +230,10 @@ def main():
             break
         elif user_input == 3:
             break
+
+
+def main():
+    game()
 
 
 if __name__ == '__main__':
