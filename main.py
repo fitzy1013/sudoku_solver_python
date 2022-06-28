@@ -30,14 +30,15 @@ def fill_matrix2(matrix):
     i, j = findNextCell(matrix, i, j)
     if i == -2:
         return True
-    numbers = create_random_number_list()
-    for m in range(0, 9):
-        if isValid(matrix, i, j, numbers[m], False):
-            matrix[i][j] = numbers[m]
+    numbers = create_random_number_list(matrix, i, j)
+    random.shuffle(numbers)
+    for m in numbers:
+        if isValid(matrix, i, j, m, False):
+            matrix[i][j] = m
             if fill_matrix2(matrix):
                 return True
-            matrix[i][j] = -1
 
+    matrix[i][j] = -1
     return False
 
 
@@ -167,13 +168,13 @@ def isValid(matrix, i, j, v, user):
     return False
 
 
-def create_random_number_list():
+def create_random_number_list(matrix, i, j):
     numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     new_numbers = []
     while len(numbers) != 0:
-        rand_index = random.randint(0, len(numbers) - 1)
-        new_numbers.append(numbers[rand_index])
-        del numbers[rand_index]
+        if isValid(matrix, i, j, numbers[len(numbers) - 1], False):
+            new_numbers.append(numbers[len(numbers) - 1])
+        numbers.pop()
 
     return new_numbers
 
@@ -184,10 +185,10 @@ def solve_matrix(matrix):
     i, j = findNextCell(matrix, i, j)
     if i == -2:
         return True
-    numbers = create_random_number_list()
-    for m in range(0, 9):
-        if isValid(matrix, i, j, numbers[m], False):
-            matrix[i][j] = numbers[m]
+    numbers = create_random_number_list(matrix, i, j)
+    for m in numbers:
+        if isValid(matrix, i, j, m, False):
+            matrix[i][j] = m
             if solve_matrix(matrix):
                 return True
             matrix[i][j] = -1
@@ -201,6 +202,7 @@ def userSolved(matrix: list):
         return False
     else:
         return True
+
 
 def game():
     print("Welcome to the Sudoku Program")
